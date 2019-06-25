@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:social_app/profilePageView.dart';
+
+import 'appbottomBar.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +15,7 @@ class _HomePageState extends State<HomePage>
   double collapsedHeightFactor = 0.4;
   double expandedHeightFactor = 0.85;
   bool isAnimationCompleted = false;
+  double screenHeight = 0;
   @override
   void initState() {
     super.initState();
@@ -39,44 +43,62 @@ class _HomePageState extends State<HomePage>
     });
   }
 
+  _handleVerticalUpdate(DragUpdateDetails updateDetails) {
+    double fractionDrageed = updateDetails.primaryDelta / screenHeight;
+    _controller.value = _controller.value - 2 * fractionDrageed;
+  }
+
+  _handleVerticalEnd(DragEndDetails endDetails) {
+    if (isAnimationCompleted) {
+      if (_controller.value < 0.9) {
+        _controller.fling(velocity: -2);
+        isAnimationCompleted = !isAnimationCompleted;
+      } else {}
+    } else {
+      if (_controller.value > 0.1) {
+        _controller.fling(velocity: 2);
+        isAnimationCompleted = !isAnimationCompleted;
+      } else {
+        _controller.fling(velocity: -1);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, widget) {
         return Scaffold(
+            backgroundColor: Color(0xffeeeeee),
+            bottomNavigationBar: AppBottomBar(),
             body: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            FractionallySizedBox(
-              alignment: Alignment.topCenter,
-              heightFactor: _heightFactorAnimation.value,
-              child: Image.asset(
-                'images/profile2.jpeg',
-                fit: BoxFit.cover,
-                height: 400,
-                colorBlendMode: BlendMode.hue,
-                color: Colors.black,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                onBottomTap();
-              },
-              child: FractionallySizedBox(
-                alignment: Alignment.bottomCenter,
-                heightFactor: 1.06 - _heightFactorAnimation.value,
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.teal,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(40.0),
-                          topRight: Radius.circular(40.0))),
+              fit: StackFit.expand,
+              children: <Widget>[
+                FractionallySizedBox(
+                  alignment: Alignment.topCenter,
+                  heightFactor: _heightFactorAnimation.value,
+                  child: ProfilePageView(),
                 ),
-              ),
-            )
-          ],
-        ));
+                GestureDetector(
+                  // onTap: onBottomTap,
+                  onVerticalDragUpdate: _handleVerticalUpdate,
+                  onVerticalDragEnd: _handleVerticalEnd,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.bottomCenter,
+                    heightFactor: 1.06 - _heightFactorAnimation.value,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(0xffeeeeee),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40.0),
+                              topRight: Radius.circular(40.0))),
+                    ),
+                  ),
+                )
+              ],
+            ));
       },
     );
   }
