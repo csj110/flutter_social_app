@@ -12,7 +12,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _heightFactorAnimation;
-  double collapsedHeightFactor = 0.4;
+  double collapsedHeightFactor = 0.5;
   double expandedHeightFactor = 0.85;
   bool isAnimationCompleted = false;
   double screenHeight = 0;
@@ -53,7 +53,9 @@ class _HomePageState extends State<HomePage>
       if (_controller.value < 0.9) {
         _controller.fling(velocity: -2);
         isAnimationCompleted = !isAnimationCompleted;
-      } else {}
+      } else {
+        _controller.fling(velocity: 1);
+      }
     } else {
       if (_controller.value > 0.1) {
         _controller.fling(velocity: 2);
